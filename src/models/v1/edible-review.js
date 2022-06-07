@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
 const {Schema, model} = require("mongoose");
 
-const shopReviewSchema = new mongoose.Schema({
+const edibleReviewSchema = new mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
-    shop: {
+    edible: {
         type: Schema.Types.ObjectId,
-        ref: 'Shop',
+        ref: 'Edible',
         required: true
     },
     text: {
@@ -53,6 +53,6 @@ const shopReviewSchema = new mongoose.Schema({
 }, {timestamps: {createdAt: true, updatedAt: true}});
 
 
-const ShopReview = model('ShopReview', shopReviewSchema);
+const EdibleReview = model('EdibleReview', edibleReviewSchema);
 
-module.exports = ShopReview;
+module.exports = EdibleReview;
