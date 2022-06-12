@@ -26,7 +26,7 @@ app.use(morgan("dev"));
 
 app.use('/api/v1/user/auth', userAuthV1Routes);
 
-const port = keys.port || process.env.PORT;
+const port = process.env.PORT || keys.port;
 
 app.listen(port, () => {
     console.log(`Server connected in ${keys.nodeENV} mode on port ${port}`);

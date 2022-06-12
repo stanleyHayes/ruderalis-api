@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-const Admin = require("./../../../models/v1/admin");
+const Vendor = require("./../../../models/v1/vendor");
 const keys = require("./../../../config/keys");
 
 exports.authenticate = async (req, res, next) => {
@@ -11,10 +11,10 @@ exports.authenticate = async (req, res, next) => {
         if(bearer !== 'Bearer' || !token)
             return res.status(400).json({message: 'Invalid header format'});
         const decoded = jwt.verify(token, keys.jwtSecret, null, null);
-        const admin = await Admin.findOne({_id: decoded._id, "devices.token": token});
-        if(!admin)
+        const vendor = await Vendor.findOne({_id: decoded._id, "devices.token": token});
+        if(!vendor)
             return res.status(401).json({message: `Session expired. Please login again!`});
-        req.admin = admin;
+        req.vendor = vendor;
         req.token = token;
         next();
     }catch (e) {

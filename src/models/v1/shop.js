@@ -63,6 +63,25 @@ const shopSchema = new mongoose.Schema({
         endDate: {
             type: Date
         }
+    },
+    destinations: {
+        type: [
+            {
+                name: {type: String, required: true},
+                price: {
+                    amount: {
+                        type: Number,
+                        min: 0,
+                        required: true
+                    },
+                    currency: {
+                        type: String,
+                        enum: ['GHS', 'USD', 'EUR'],
+                        default: 'GHS'
+                    }
+                }
+            }
+        ]
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});
 

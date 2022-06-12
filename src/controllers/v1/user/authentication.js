@@ -18,7 +18,7 @@ exports.register = async (req, res) => {
         const existingUser = await User.findOne({$or: [{username}, {phone}, {email}]});
         if (existingUser)
             return res.status(409).json({message: 'Username or phone or email already taken'});
-        const token = jwt.sign({username}, keys.jwtSecret, {expiresIn: '48hrs'}, null);
+        const token = jwt.sign({username}, keys.jwtSecret, {expiresIn: '48h'}, null);
         const otp = otpGenerator.generate(
             parseInt(keys.otpLength), {
                 lowerCaseAlphabets: false,
@@ -80,20 +80,18 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             {_id: existingUser._id.toString()},
             keys.jwtSecret,
-            {expiresIn: '5 minutes'},
+            {expiresIn: '1h'},
             null
         );
 
         existingUser.authInfo = {
             otp,
-            expiryDate: moment().add(5, 'minutes'),
+            expiryDate: moment().add(1, 'hours'),
             token
         }
-
         await existingUser.save();
-
-        const link = `https://localhost:3000/auth/otp/${token}`;
-        const message = `Your OTP is ${otp}. OTP expires in 5 minutes. Access the link through ${link}`;
+        const link = `https://localhost:3000/auth/otp/${token}/verify`;
+        const message = `Your OTP is ${otp}. OTP expires in 1 hour. Access the link through ${link}`;
         // await sendSMS(existingUser.phone, message);
         const subject = `Ruderalis OTP`;
         await sendEmail(existingUser.email, subject, message);
@@ -123,7 +121,7 @@ exports.verifyLoginOTP = async (req, res) => {
         const loginOTP = jwt.sign(
             {_id: user._id.toString()},
             keys.jwtSecret,
-            {expiresIn: '24 hours'},
+            {expiresIn: '24h'},
             null
         );
 
@@ -139,7 +137,7 @@ exports.verifyLoginOTP = async (req, res) => {
         });
 
         await user.save();
-        res.status(200).json({message: 'OTP verified successfully', data: user, token});
+        res.status(200).json({message: 'OTP verified successfully', data: user, token: loginOTP});
     } catch (e) {
         res.status(500).json({message: 'OTP Expired. Please login again'});
     }
@@ -190,13 +188,13 @@ exports.changePassword = async (req, res) => {
         const token = jwt.sign(
             {_id: req.user._id.toString()},
             keys.jwtSecret,
-            {expiresIn: '5 minutes'},
+            {expiresIn: '1h'},
             null
         );
 
         req.user.authInfo = {
             token,
-            expiryDate: moment().add(5, 'minutes')
+            expiryDate: moment().add(1, 'hour')
         };
 
         const link = `https://ruderalis.vercel.app/auth/reset-password?token=${token}`;
@@ -284,8 +282,19 @@ exports.deleteProfile = async (req, res) => {
 
 exports.resendOTP = async (req, res) => {
     try {
-        const {email} = req.body;
-        const existingUser = await User.findOne({email});
+        const {usernameOrEmailOrPhone} = req.body;
+        const existingUser = await User.findOne({
+            $or: [
+                {username: usernameOrEmailOrPhone},
+                {email: usernameOrEmailOrPhone},
+                {phone: usernameOrEmailOrPhone}
+            ]
+        });
+
+        if (!existingUser)
+            return res.status(404).json({
+                message: 'No user associated with the provided username, email or password'
+            })
         const otp = otpGenerator.generate(parseInt(keys.otpLength), {
             digits: true,
             lowerCaseAlphabets: false,
@@ -295,22 +304,23 @@ exports.resendOTP = async (req, res) => {
         const token = jwt.sign(
             {_id: existingUser._id.toString()},
             keys.jwtSecret,
-            {expiresIn: '5 minutes'},
+            {expiresIn: '1h'},
             null
         );
         existingUser.authInfo = {
             otp,
-            expiryDate: moment().add(5, 'minutes'),
+            expiryDate: moment().add(1, 'hour'),
             token
         }
         await existingUser.save();
-        const message = `Your OTP is ${otp}. OTP expires in 5 minutes`;
+        const message = `Your OTP is ${otp}. OTP expires in 1 hour`;
         // await sendSMS(phone, message);
         const subject = `Ruderalis OTP`;
-        await sendEmail(req.user.email, subject, message);
+        await sendEmail(existingUser.email, subject, message);
 
-        res.status(200).json({message: 'Profile deleted successfully'});
+        res.status(200).json({message: 'OTP sent successfully', token});
     } catch (e) {
+        console.log(e.message)
         res.status(500).json({message: e.message});
     }
 }
@@ -381,7 +391,11 @@ exports.resetPassword = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
     try {
-        res.status(200).json({message: 'Profile retrieved successfully', data: req.user, token: req.token});
+        res.status(200).json({
+            message: 'Profile retrieved successfully',
+            data: req.user,
+            token: req.token
+        });
     } catch (e) {
         res.status(401).json({message: e.message});
     }

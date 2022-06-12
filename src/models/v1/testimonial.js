@@ -4,16 +4,12 @@ const {Schema, model} = require("mongoose");
 const testimonialSchema = new mongoose.Schema({
     user: {
         type: Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    vendor: {
-        type: Schema.Types.ObjectId,
-        ref: 'User'
-    },
-    role: {
-        type: String,
-        enum: ['vendor', 'user'],
+        ref: 'User',
         required: true
+    },
+    shop: {
+        type: Schema.Types.ObjectId,
+        ref: 'Shop'
     },
     text: {
         type: String,
