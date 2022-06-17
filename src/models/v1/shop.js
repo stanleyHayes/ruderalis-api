@@ -50,7 +50,7 @@ const shopSchema = new mongoose.Schema({
     image: {type: String, required: true},
     rank: {
         type: Number,
-        default: 1
+        default: 10
     },
     featured: {
         value: {

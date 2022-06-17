@@ -11,5 +11,6 @@ module.exports = {
     twilioAccountSID: process.env.TWILIO_ACCOUNT_SID,
     twilioPhoneNumber: process.env.TWILIO_PHONE_NUMBER,
     sendGridAPIKey: process.env.SENDGRID_API_KEY,
-    sendGridFromEmail: process.env.SENGRID_FROM_EMAIL
+    sendGridFromEmail: process.env.SENGRID_FROM_EMAIL,
+    cloudinaryURL: process.env.CLOUDINARY_URL
 }
