@@ -4,7 +4,11 @@ const productSchema = new mongoose.Schema({
     name: {type: String, trim: true, required: true},
     owner: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Vendor'},
     shop: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Shop'},
-    status: {type: String, enum: [''], default: ''},
+    status: {
+        type: String,
+        enum: ['active', 'deleted', 'pending'],
+        default: 'pending'
+    },
     stock: {
         available: {type: Boolean, default: true},
         quantity: {type: Number, min: 0}
@@ -62,8 +66,49 @@ const productSchema = new mongoose.Schema({
         marijuana: {},
         edible: {},
         accessory: {}
+    },
+    rating: {
+        average: {
+            type: Number,
+            default: 0
+        },
+        count: {
+            type: Number,
+            default: 0
+        },
+        details: {
+            five: {
+                type: Number,
+                default: 0
+            },
+            four: {
+                type: Number,
+                default: 0
+            },
+            three: {
+                type: Number,
+                default: 0
+            },
+            two: {
+                type: Number,
+                default: 0
+            },
+            one: {
+                type: Number,
+                default: 0
+            }
+        }
+    },
+    variant: {
+        type: String,
+        enum: ['marijuana', 'edible', 'accessory'],
+        required: true
     }
-}, {timestamps: {createdAt: true, updatedAt: true}});
+}, {
+    timestamps: {createdAt: true, updatedAt: true},
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
 
 productSchema.virtual('reviews', {
     justOne: false,
@@ -71,7 +116,6 @@ productSchema.virtual('reviews', {
     foreignField: 'product',
     ref: 'Product',
 });
-
 
 
 const Product = mongoose.model('Product', productSchema);

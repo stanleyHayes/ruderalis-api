@@ -7,10 +7,6 @@ const testimonialSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    shop: {
-        type: Schema.Types.ObjectId,
-        ref: 'Shop'
-    },
     text: {
         type: String,
         required: true

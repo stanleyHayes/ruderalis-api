@@ -6,6 +6,11 @@ const orderSchema = new mongoose.Schema({
         enum: ['pending', 'completed', 'cancelled', 'delivering'],
         default: 'pending'
     },
+    shop: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Shop',
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',

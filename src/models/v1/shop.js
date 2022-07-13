@@ -12,7 +12,7 @@ const shopSchema = new mongoose.Schema({
     owner: {
         type: Schema.Types.ObjectId,
         required: true,
-        ref: 'Vendor'
+        ref: 'User'
     },
     contact: {
         phone: {
@@ -82,8 +82,88 @@ const shopSchema = new mongoose.Schema({
                 }
             }
         ]
+    },
+    rating: {
+        average: {
+            type: Number,
+            default: 0
+        },
+        count: {
+            type: Number,
+            default: 0
+        },
+        details: {
+            five: {
+                type: Number,
+                default: 0
+            },
+            four: {
+                type: Number,
+                default: 0
+            },
+            three: {
+                type: Number,
+                default: 0
+            },
+            two: {
+                type: Number,
+                default: 0
+            },
+            one: {
+                type: Number,
+                default: 0
+            }
+        }
+    },
+}, {
+    timestamps: {createdAt: true, updatedAt: true},
+    toJSON: {virtuals: true},
+    toObject: {virtuals: true}
+});
+
+shopSchema.virtual('reviews', {
+    justOne: false,
+    localField: '_id',
+    foreignField: 'shop',
+    ref: 'ShopReview',
+});
+
+shopSchema.virtual('products', {
+    justOne: false,
+    localField: '_id',
+    foreignField: 'shop',
+    ref: 'Product',
+});
+
+shopSchema.virtual('productCount', {
+    justOne: false,
+    localField: '_id',
+    foreignField: 'shop',
+    ref: 'Product',
+    count: true
+});
+
+
+shopSchema.virtual('featuredProducts', {
+    justOne: false,
+    localField: '_id',
+    foreignField: 'shop',
+    ref: 'Product',
+    match: shop => {
+        return {"featured.status": true, shop: shop._id}
     }
-}, {timestamps: {createdAt: true, updatedAt: true}});
+});
+
+
+shopSchema.virtual('onSaleProducts', {
+    justOne: false,
+    localField: '_id',
+    foreignField: 'shop',
+    ref: 'Product',
+    match: shop => {
+        return {"sale.status": true, shop: shop._id}
+    }
+});
 
 const Shop = mongoose.model('Shop', shopSchema);
 

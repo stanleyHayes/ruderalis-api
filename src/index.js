@@ -19,9 +19,9 @@ mongoose.connect(keys.mongoDBURI).then(value => {
 
 const app = express();
 
-app.use(cors());
+app.use(cors({origin: '*', 'Access-Control-Allow-Origin': "*"}));
 app.use(helmet())
-app.use(express.json());
+app.use(express.json({limit: '5MB'}));
 app.use(expressUserAgent.express());
 app.use(morgan("dev"));
 
