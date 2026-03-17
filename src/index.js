@@ -79,10 +79,14 @@ const adminAuditLogV1Routes = require("./routes/v1/admin/audit-log");
 const adminDispensaryV1Routes = require("./routes/v1/admin/dispensaries");
 const adminSettingsV1Routes = require("./routes/v1/admin/settings");
 
-mongoose.connect(keys.mongoDBURI).then(value => {
+mongoose.connect(keys.mongoDBURI, {
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000
+}).then(value => {
     console.log(`Connected to MongoDB on database ${value.connection.db.databaseName}`);
 }).catch(error => {
-    console.log(`Error: ${error.message}`);
+    console.log(`MongoDB connection error: ${error.message}`);
 });
 
 const app = express();
