@@ -61,7 +61,7 @@ const promotionSchema = new mongoose.Schema({
     },
     payment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Payment',
         required: true
     }
 }, {timestamps: {createdAt: true, updatedAt: true}});

@@ -79,12 +79,27 @@ exports.getProducts = async (req, res) => {
         if (req.query.status) {
             match['status'] = req.query.status;
         }
+        if (req.query.variant) {
+            match['variant'] = req.query.variant;
+        }
+        if (req.query.shop) {
+            match['shop'] = req.query.shop;
+        }
+        if (req.query.featured === 'true') {
+            match['featured.status'] = true;
+        }
+        if (req.query.sale === 'true') {
+            match['sale.status'] = true;
+        }
+        if (req.query.search) {
+            match['name'] = {$regex: req.query.search, $options: 'i'};
+        }
         const products = await Product.find(match).skip(skip).limit(limit).sort({
             rank: -1,
             "rating.average": -1,
             createdAt: -1
         }).populate({path: 'reviews', populate: {path: 'user'}});
-        const totalProducts = await Product.find(match).countDocuments();
+        const totalProducts = await Product.countDocuments(match);
 
         res.status(200).json({message: 'Products Retrieved Successfully', data: products, count: totalProducts});
     } catch (e) {

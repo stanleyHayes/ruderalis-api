@@ -86,7 +86,7 @@ exports.getPromotions = async (req, res) => {
             .populate({path: 'item.product'})
             .populate({path: 'user'})
             .skip(skip).limit(limit).sort({createdAt: -1});
-        const totalProducts = await Promotion.find(match).countDocuments();
+        const totalProducts = await Promotion.countDocuments(match);
 
         res.status(200).json({message: 'Promotion submitted successfully', data: products, count: totalProducts});
     } catch (e) {

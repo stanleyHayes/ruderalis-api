@@ -60,7 +60,7 @@ exports.getReviews = async (req, res) => {
             .populate({path: 'user', select: 'fullName'})
             .populate({path: 'product', select: 'name'});
 
-        const totalReviews = await Review.find(match).countDocuments();
+        const totalReviews = await Review.countDocuments(match);
         res.status(200).json({message: 'Reviews retrieved successfully', data: reviews, count: totalReviews})
     } catch (e) {
         res.status(500).json({message: e.message});
@@ -130,7 +130,7 @@ exports.deleteReview = async (req, res) => {
         if(req.user.role === 'user') {
             if (req.user._id !== review.user._id)
                 return res.status(403).json({message: "You don't have enough permissions to perform this operation"});
-            await review.remove();
+            await review.deleteOne();
         }
         if(req.user.role === 'vendor'){
             const product = await Product.findById(review.product);
@@ -138,7 +138,7 @@ exports.deleteReview = async (req, res) => {
                 return res.status(404).json({message: 'Product not found'});
             if(req.user._id !== product.owner)
                 return res.status(403).json({message: "You don't have enough permissions to perform this operation"});
-            await review.remove();
+            await review.deleteOne();
             return res.status(200).json({message: 'Review updated successfully', data: review});
         }
     }catch (e) {

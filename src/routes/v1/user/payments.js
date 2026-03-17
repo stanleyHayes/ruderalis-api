@@ -12,3 +12,5 @@ router.route('/')
 
 router.route('/:id')
     .get(authenticate, getPayment);
+
+module.exports = router;

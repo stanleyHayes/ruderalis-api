@@ -80,7 +80,7 @@ const userSchema = new mongoose.Schema({
         type: [
             {
                 password: {type: String},
-                updatedAt: {type: Date, default: Date.now()}
+                updatedAt: {type: Date, default: Date.now}
             }
         ]
     },

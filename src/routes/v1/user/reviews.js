@@ -18,3 +18,5 @@ router.route('/:id')
     .get(authenticate, getReview)
     .put(authenticate, updateReview)
     .delete(authenticate, deleteReview);
+
+module.exports = router;

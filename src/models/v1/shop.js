@@ -115,6 +115,46 @@ const shopSchema = new mongoose.Schema({
             }
         }
     },
+    operatingHours: {
+        open: {type: String},
+        close: {type: String}
+    },
+    license: {
+        type: String,
+        trim: true
+    },
+    paymentDetails: {
+        bankName: {type: String, trim: true},
+        accountNumber: {type: String, trim: true},
+        accountName: {type: String, trim: true},
+        routingNumber: {type: String, trim: true},
+        mobileMoneyProvider: {type: String, enum: ['mtn', 'vodafone', 'airtelTigo', ''], default: ''},
+        mobileMoneyNumber: {type: String, trim: true}
+    },
+    shippingRates: {
+        type: [
+            {
+                name: {type: String, required: true, trim: true},
+                price: {type: Number, required: true, min: 0},
+                estimatedDays: {type: String, trim: true},
+                currency: {type: String, enum: ['GHS', 'USD', 'EUR'], default: 'GHS'}
+            }
+        ]
+    },
+    address: {
+        street: {type: String, trim: true},
+        city: {type: String, trim: true},
+        state: {type: String, trim: true},
+        zip: {type: String, trim: true},
+        country: {type: String, trim: true}
+    },
+    notifications: {
+        email: {type: Boolean, default: true},
+        sms: {type: Boolean, default: true},
+        push: {type: Boolean, default: true},
+        orderUpdates: {type: Boolean, default: true},
+        promotions: {type: Boolean, default: false}
+    }
 }, {
     timestamps: {createdAt: true, updatedAt: true},
     toJSON: {virtuals: true},

@@ -95,7 +95,7 @@ exports.login = async (req, res) => {
         const message = `Your OTP is ${otp}. OTP expires in 1 hour. Access the link through ${link}`;
         // await sendSMS(existingUser.phone, message);
         const subject = `Ruderalis OTP`;
-        await sendEmail(existingUser.email, subject, message);
+        //await sendEmail(existingUser.email, subject, message);
         res.status(200).json({message: 'Check your email to verify otp.', token});
     } catch (e) {
         res.status(500).json({message: e.message});
@@ -329,7 +329,7 @@ exports.resendOTP = async (req, res) => {
 
 exports.logout = async (req, res) => {
     try {
-        req.user.devices.filter(device => device.token !== req.token);
+        req.user.devices = req.user.devices.filter(device => device.token !== req.token);
         await req.user.save();
         res.status(201).json({message: 'Logged out successfully'});
     } catch (e) {

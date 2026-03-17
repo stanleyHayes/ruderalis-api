@@ -51,7 +51,7 @@ exports.getPayments = async (req, res) => {
         const limit = parseInt(req.query.size) || 50;
         const skip = (page - 1) * limit;
         const payments = await Payment.find(match).limit(limit).skip(skip).sort({createdAt: -1});
-        const totalPayments = await Payment.find(match).countDocuments();
+        const totalPayments = await Payment.countDocuments(match);
         res.status(200).json({message: 'Payments retrieved', data: payments, count: totalPayments});
     }catch (e) {
         res.status(500).json({message: e.message});

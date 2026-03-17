@@ -1,0 +1,4836 @@
+openapi: 3.0.3
+info:
+  title: Ruderalis API
+  description: Medical marijuana ecommerce backend API
+  version: 1.0.0
+  contact:
+    name: Ruderalis API Support
+
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development server
+
+security: []
+
+components:
+  securitySchemes:
+    UserAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated users (vendor or user role)
+    VendorAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated vendors (role=vendor)
+    AdminAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for authenticated admins (admin or super-admin role)
+
+  schemas:
+    Address:
+      type: object
+      properties:
+        country:
+          type: string
+        region:
+          type: string
+        city:
+          type: string
+        street:
+          type: string
+        gpAddressOrHouseNumber:
+          type: string
+        landmark:
+          type: string
+
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fullName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended, pending, deleted, frozen]
+        role:
+          type: string
+          enum: [vendor, user]
+        address:
+          $ref: '#/components/schemas/Address'
+        permissions:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Admin:
+      type: object
+      properties:
+        _id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fullName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        status:
+          type: string
+          enum: [active, suspended, pending, deleted]
+        role:
+          type: string
+          enum: [admin, super-admin]
+        permissions:
+          type: object
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Price:
+      type: object
+      properties:
+        amount:
+          type: number
+        currency:
+          type: string
+          enum: [GHS, USD, EUR]
+
+    Stock:
+      type: object
+      properties:
+        available:
+          type: boolean
+        quantity:
+          type: integer
+
+    SaleInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        price:
+          $ref: '#/components/schemas/Price'
+
+    FeaturedInfo:
+      type: object
+      properties:
+        status:
+          type: boolean
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    RatingDetails:
+      type: object
+      properties:
+        five:
+          type: integer
+        four:
+          type: integer
+        three:
+          type: integer
+        two:
+          type: integer
+        one:
+          type: integer
+
+    Rating:
+      type: object
+      properties:
+        average:
+          type: number
+        count:
+          type: integer
+        details:
+          $ref: '#/components/schemas/RatingDetails'
+
+    ProductMetadata:
+      type: object
+      properties:
+        marijuana:
+          type: object
+        edible:
+          type: object
+        accessory:
+          type: object
+
+    Product:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        owner:
+          type: string
+          description: ObjectId reference to User
+        shop:
+          type: string
+          description: ObjectId reference to Shop
+        status:
+          type: string
+          enum: [active, deleted, pending]
+        stock:
+          $ref: '#/components/schemas/Stock'
+        price:
+          $ref: '#/components/schemas/Price'
+        description:
+          type: string
+        image:
+          type: string
+        sale:
+          $ref: '#/components/schemas/SaleInfo'
+        rank:
+          type: integer
+        featured:
+          $ref: '#/components/schemas/FeaturedInfo'
+        metadata:
+          $ref: '#/components/schemas/ProductMetadata'
+        rating:
+          $ref: '#/components/schemas/Rating'
+        variant:
+          type: string
+          enum: [marijuana, edible, accessory]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Destination:
+      type: object
+      properties:
+        name:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+
+    ShopFeatured:
+      type: object
+      properties:
+        value:
+          type: boolean
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+
+    Shop:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        owner:
+          type: string
+          description: ObjectId reference to User
+        contact:
+          type: object
+          properties:
+            phone:
+              type: string
+            email:
+              type: string
+              format: email
+        description:
+          type: string
+        status:
+          type: string
+          enum: [pending, suspended, frozen, deleted, active]
+        image:
+          type: string
+        rank:
+          type: integer
+        featured:
+          $ref: '#/components/schemas/ShopFeatured'
+        destinations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Destination'
+        rating:
+          $ref: '#/components/schemas/Rating'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OrderItem:
+      type: object
+      properties:
+        product:
+          type: string
+          description: ObjectId reference to Product
+        quantity:
+          type: integer
+        status:
+          type: string
+
+    Order:
+      type: object
+      properties:
+        _id:
+          type: string
+        status:
+          type: string
+          enum: [pending, completed, cancelled, delivering]
+        shop:
+          type: string
+          description: ObjectId reference to Shop
+        user:
+          type: string
+          description: ObjectId reference to User
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        price:
+          $ref: '#/components/schemas/Price'
+        destination:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Review:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: ObjectId reference to User
+        product:
+          type: string
+          description: ObjectId reference to Product
+        text:
+          type: string
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+        visible:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ShopReview:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: ObjectId reference to User
+        shop:
+          type: string
+          description: ObjectId reference to Shop
+        text:
+          type: string
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+        visible:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    PaymentParty:
+      type: object
+      properties:
+        provider:
+          type: string
+          enum: [mtn, vodafone, airtelTigo]
+        number:
+          type: string
+
+    Payment:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: ObjectId reference to User
+        price:
+          $ref: '#/components/schemas/Price'
+        method:
+          type: string
+          enum: [mobile money]
+        status:
+          type: string
+          enum: [pending, failed, success]
+        sender:
+          $ref: '#/components/schemas/PaymentParty'
+        recipient:
+          $ref: '#/components/schemas/PaymentParty'
+        transactionID:
+          type: string
+        purpose:
+          type: string
+          enum: [product-promotion, store-promotion, daily-payment, monthly-payment, store-setup, product-setup]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Duration:
+      type: object
+      properties:
+        amount:
+          type: number
+        unit:
+          type: string
+          enum: [day, month, year]
+
+    Promotion:
+      type: object
+      properties:
+        _id:
+          type: string
+        item:
+          type: object
+          properties:
+            shop:
+              type: string
+              description: ObjectId reference to Shop
+            product:
+              type: string
+              description: ObjectId reference to Product
+        user:
+          type: string
+          description: ObjectId reference to User
+        variant:
+          type: string
+          enum: [shop, product]
+        rank:
+          type: integer
+        price:
+          $ref: '#/components/schemas/Price'
+        startDate:
+          type: string
+          format: date-time
+        duration:
+          $ref: '#/components/schemas/Duration'
+        endDate:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum: [pending, active, expired]
+        payment:
+          type: string
+          description: ObjectId reference to Payment
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    Testimonial:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: ObjectId reference to User
+        text:
+          type: string
+        rating:
+          type: number
+          minimum: 0
+          maximum: 5
+        visible:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    FAQ:
+      type: object
+      properties:
+        _id:
+          type: string
+        question:
+          type: string
+        answer:
+          type: string
+        category:
+          type: string
+        visible:
+          type: boolean
+        order:
+          type: integer
+        createdBy:
+          type: string
+          description: ObjectId reference to Admin
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    MessageReply:
+      type: object
+      properties:
+        text:
+          type: string
+        admin:
+          type: string
+          description: ObjectId reference to Admin
+        repliedAt:
+          type: string
+          format: date-time
+
+    Message:
+      type: object
+      properties:
+        _id:
+          type: string
+        user:
+          type: string
+          description: ObjectId reference to User
+        subject:
+          type: string
+        text:
+          type: string
+        status:
+          type: string
+          enum: [pending, read, replied]
+        reply:
+          $ref: '#/components/schemas/MessageReply'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ShopVisit:
+      type: object
+      properties:
+        _id:
+          type: string
+        visitor:
+          type: string
+          description: ObjectId reference to User
+        shop:
+          type: string
+          description: ObjectId reference to Shop
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    SuccessMessage:
+      type: object
+      properties:
+        message:
+          type: string
+
+    PaginatedResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        data:
+          type: array
+          items: {}
+        count:
+          type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      schema:
+        type: integer
+        default: 1
+    SizeParam:
+      name: size
+      in: query
+      schema:
+        type: integer
+        default: 20
+    IdParam:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+    TokenParam:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+
+paths:
+  # ─────────────────────────────────────────────
+  # User Auth
+  # ─────────────────────────────────────────────
+  /user/auth/register:
+    post:
+      tags: [User Auth]
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, phone, firstName, lastName, pin, email, role]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                pin:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [vendor, user]
+      responses:
+        '201':
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/login:
+    post:
+      tags: [User Auth]
+      summary: Login a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usernameOrEmailOrPhone, password]
+              properties:
+                usernameOrEmailOrPhone:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+
+  /user/auth/otp/{token}/verify:
+    post:
+      tags: [User Auth]
+      summary: Verify OTP
+      parameters:
+        - $ref: '#/components/parameters/TokenParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [otp]
+              properties:
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: OTP verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+
+  /user/auth/otp/resend:
+    post:
+      tags: [User Auth]
+      summary: Resend OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usernameOrEmailOrPhone]
+              properties:
+                usernameOrEmailOrPhone:
+                  type: string
+      responses:
+        '200':
+          description: OTP resent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+
+  /user/auth/profile:
+    get:
+      tags: [User Auth]
+      summary: Get user profile
+      security:
+        - UserAuth: []
+      responses:
+        '200':
+          description: User profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+    put:
+      tags: [User Auth]
+      summary: Update user profile
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                phone:
+                  type: string
+                address:
+                  $ref: '#/components/schemas/Address'
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Auth]
+      summary: Delete user profile (mark as deleted)
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pin]
+              properties:
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Profile deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/profile/{token}:
+    put:
+      tags: [User Auth]
+      summary: Verify profile update with OTP
+      parameters:
+        - $ref: '#/components/parameters/TokenParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [otp]
+              properties:
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: Profile verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/profile/freeze:
+    delete:
+      tags: [User Auth]
+      summary: Deactivate (freeze) user profile
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pin]
+              properties:
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Profile frozen
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/profile/activate:
+    put:
+      tags: [User Auth]
+      summary: Reactivate user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pin, email]
+              properties:
+                pin:
+                  type: string
+                email:
+                  type: string
+                  format: email
+      responses:
+        '200':
+          description: Profile reactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/passwords/change:
+    put:
+      tags: [User Auth]
+      summary: Change password
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, password]
+              properties:
+                currentPassword:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/passwords/reset:
+    put:
+      tags: [User Auth]
+      summary: Reset password
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/pins/change:
+    put:
+      tags: [User Auth]
+      summary: Change pin
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPin, pin]
+              properties:
+                currentPin:
+                  type: string
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Pin changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/pins/reset:
+    put:
+      tags: [User Auth]
+      summary: Reset pin
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pin]
+              properties:
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Pin reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/logout:
+    post:
+      tags: [User Auth]
+      summary: Logout current session
+      security:
+        - UserAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/auth/logoutAll:
+    post:
+      tags: [User Auth]
+      summary: Logout all sessions
+      security:
+        - UserAuth: []
+      responses:
+        '200':
+          description: All sessions logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Products
+  # ─────────────────────────────────────────────
+  /user/products:
+    post:
+      tags: [User Products]
+      summary: Create a product
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, shop, stock, price, description, image, details, variant]
+              properties:
+                name:
+                  type: string
+                shop:
+                  type: string
+                stock:
+                  $ref: '#/components/schemas/Stock'
+                price:
+                  $ref: '#/components/schemas/Price'
+                description:
+                  type: string
+                image:
+                  type: string
+                details:
+                  type: object
+                variant:
+                  type: string
+                  enum: [marijuana, edible, accessory]
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Products]
+      summary: List products
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: owner
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+
+  /user/products/{id}:
+    get:
+      tags: [User Products]
+      summary: Get a product by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Product'
+    put:
+      tags: [User Products]
+      summary: Update a product
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contact:
+                  type: object
+                description:
+                  type: string
+                image:
+                  type: string
+                stock:
+                  $ref: '#/components/schemas/Stock'
+                price:
+                  $ref: '#/components/schemas/Price'
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Products]
+      summary: Delete a product
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Shops
+  # ─────────────────────────────────────────────
+  /user/shops:
+    post:
+      tags: [User Shops]
+      summary: Create a shop
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, contact, description, image, destinations]
+              properties:
+                name:
+                  type: string
+                contact:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                description:
+                  type: string
+                image:
+                  type: string
+                destinations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Destination'
+      responses:
+        '201':
+          description: Shop created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Shops]
+      summary: List shops
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: owner
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shops retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shop'
+                  count:
+                    type: integer
+
+  /user/shops/{id}:
+    get:
+      tags: [User Shops]
+      summary: Get a shop by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Shop'
+    put:
+      tags: [User Shops]
+      summary: Update a shop
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contact:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                description:
+                  type: string
+                image:
+                  type: string
+                destinations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Destination'
+      responses:
+        '200':
+          description: Shop updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Shops]
+      summary: Delete a shop
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Reviews
+  # ─────────────────────────────────────────────
+  /user/reviews:
+    post:
+      tags: [User Reviews]
+      summary: Create a product review
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [product, text, rating]
+              properties:
+                product:
+                  type: string
+                text:
+                  type: string
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+      responses:
+        '201':
+          description: Review created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Reviews]
+      summary: List product reviews
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: product
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  count:
+                    type: integer
+
+  /user/reviews/{id}:
+    get:
+      tags: [User Reviews]
+      summary: Get a review by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Review'
+    put:
+      tags: [User Reviews]
+      summary: Update a review
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                text:
+                  type: string
+                visible:
+                  type: boolean
+                  description: Vendor only
+      responses:
+        '200':
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Reviews]
+      summary: Delete a review
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Shop Reviews
+  # ─────────────────────────────────────────────
+  /user/shop-reviews:
+    post:
+      tags: [User Shop Reviews]
+      summary: Create a shop review
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shop, text, rating]
+              properties:
+                shop:
+                  type: string
+                text:
+                  type: string
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+      responses:
+        '201':
+          description: Shop review created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Shop Reviews]
+      summary: List shop reviews
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Shop reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShopReview'
+                  count:
+                    type: integer
+
+  /user/shop-reviews/{id}:
+    get:
+      tags: [User Shop Reviews]
+      summary: Get a shop review by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShopReview'
+    put:
+      tags: [User Shop Reviews]
+      summary: Update a shop review
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                text:
+                  type: string
+                visible:
+                  type: boolean
+                  description: Vendor only
+      responses:
+        '200':
+          description: Shop review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Shop Reviews]
+      summary: Delete a shop review
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Orders
+  # ─────────────────────────────────────────────
+  /user/orders:
+    post:
+      tags: [User Orders]
+      summary: Create an order
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [items, price, destination, shop]
+              properties:
+                items:
+                  type: array
+                  items:
+                    type: object
+                    required: [product, quantity]
+                    properties:
+                      product:
+                        type: string
+                      quantity:
+                        type: integer
+                price:
+                  $ref: '#/components/schemas/Price'
+                destination:
+                  type: string
+                shop:
+                  type: string
+      responses:
+        '201':
+          description: Order created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Orders]
+      summary: List orders
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: shop
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  count:
+                    type: integer
+
+  /user/orders/{id}:
+    get:
+      tags: [User Orders]
+      summary: Get an order by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Order retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Order'
+    put:
+      tags: [User Orders]
+      summary: Update an order destination
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [destination]
+              properties:
+                destination:
+                  type: string
+      responses:
+        '200':
+          description: Order updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /user/orders/{id}/cancel:
+    put:
+      tags: [User Orders]
+      summary: Cancel an order
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Order cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User Payments
+  # ─────────────────────────────────────────────
+  /user/payments:
+    post:
+      tags: [User Payments]
+      summary: Create a payment
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [price, method, sender, recipient, transactionID]
+              properties:
+                price:
+                  $ref: '#/components/schemas/Price'
+                method:
+                  type: string
+                sender:
+                  $ref: '#/components/schemas/PaymentParty'
+                recipient:
+                  $ref: '#/components/schemas/PaymentParty'
+                transactionID:
+                  type: string
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Payments]
+      summary: List payments
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: method
+          in: query
+          schema:
+            type: string
+        - name: senderProvider
+          in: query
+          schema:
+            type: string
+        - name: recipientProvider
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payments retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  count:
+                    type: integer
+
+  /user/payments/{id}:
+    get:
+      tags: [User Payments]
+      summary: Get a payment by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Payment'
+
+  # ─────────────────────────────────────────────
+  # User Promotions
+  # ─────────────────────────────────────────────
+  /user/promotions:
+    post:
+      tags: [User Promotions]
+      summary: Create a promotion
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variant, item, rank, startDate, duration, price, method, sender, recipient, transactionID]
+              properties:
+                variant:
+                  type: string
+                  enum: [shop, product]
+                item:
+                  type: string
+                rank:
+                  type: integer
+                startDate:
+                  type: string
+                  format: date-time
+                duration:
+                  $ref: '#/components/schemas/Duration'
+                price:
+                  $ref: '#/components/schemas/Price'
+                method:
+                  type: string
+                sender:
+                  $ref: '#/components/schemas/PaymentParty'
+                recipient:
+                  $ref: '#/components/schemas/PaymentParty'
+                transactionID:
+                  type: string
+      responses:
+        '201':
+          description: Promotion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Promotions]
+      summary: List promotions
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: variant
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Promotions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Promotion'
+                  count:
+                    type: integer
+
+  /user/promotions/{id}:
+    get:
+      tags: [User Promotions]
+      summary: Get a promotion by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Promotion retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Promotion'
+
+  # ─────────────────────────────────────────────
+  # User Testimonials
+  # ─────────────────────────────────────────────
+  /user/testimonials:
+    post:
+      tags: [User Testimonials]
+      summary: Create a testimonial
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text, rating]
+              properties:
+                text:
+                  type: string
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+      responses:
+        '201':
+          description: Testimonial created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Testimonials]
+      summary: List testimonials
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Testimonials retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Testimonial'
+                  count:
+                    type: integer
+
+  /user/testimonials/{id}:
+    get:
+      tags: [User Testimonials]
+      summary: Get a testimonial by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Testimonial retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Testimonial'
+    put:
+      tags: [User Testimonials]
+      summary: Update a testimonial
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  minimum: 0
+                  maximum: 5
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Testimonial updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [User Testimonials]
+      summary: Delete a testimonial
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Testimonial deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # User FAQs (public, no auth)
+  # ─────────────────────────────────────────────
+  /user/faqs:
+    get:
+      tags: [User FAQs]
+      summary: List FAQs (public)
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: FAQs retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FAQ'
+                  count:
+                    type: integer
+
+  /user/faqs/{id}:
+    get:
+      tags: [User FAQs]
+      summary: Get a FAQ by ID (public)
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: FAQ retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/FAQ'
+
+  # ─────────────────────────────────────────────
+  # User Messages
+  # ─────────────────────────────────────────────
+  /user/messages:
+    post:
+      tags: [User Messages]
+      summary: Send a message
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [subject, text]
+              properties:
+                subject:
+                  type: string
+                text:
+                  type: string
+      responses:
+        '201':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Messages]
+      summary: List messages
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Messages retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  count:
+                    type: integer
+
+  /user/messages/{id}:
+    get:
+      tags: [User Messages]
+      summary: Get a message by ID
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Message retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Message'
+
+  # ─────────────────────────────────────────────
+  # User Customers
+  # ─────────────────────────────────────────────
+  /user/customers:
+    get:
+      tags: [User Customers]
+      summary: List customers (for vendors)
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: Customers retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  count:
+                    type: integer
+
+  # ─────────────────────────────────────────────
+  # User Shop Visits
+  # ─────────────────────────────────────────────
+  /user/shop-visits:
+    post:
+      tags: [User Shop Visits]
+      summary: Record a shop visit
+      security:
+        - UserAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shop]
+              properties:
+                shop:
+                  type: string
+      responses:
+        '201':
+          description: Shop visit recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [User Shop Visits]
+      summary: List shop visits
+      security:
+        - UserAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: shop
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shop visits retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShopVisit'
+                  count:
+                    type: integer
+
+  # ─────────────────────────────────────────────
+  # Vendor Shops
+  # ─────────────────────────────────────────────
+  /vendor/shops:
+    post:
+      tags: [Vendor Shops]
+      summary: Create a shop
+      security:
+        - VendorAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, contact, description, image, destinations]
+              properties:
+                name:
+                  type: string
+                contact:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                description:
+                  type: string
+                image:
+                  type: string
+                destinations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Destination'
+      responses:
+        '201':
+          description: Shop created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [Vendor Shops]
+      summary: List vendor shops
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shops retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shop'
+                  count:
+                    type: integer
+
+  /vendor/shops/{id}:
+    get:
+      tags: [Vendor Shops]
+      summary: Get a shop by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Shop'
+    put:
+      tags: [Vendor Shops]
+      summary: Update a shop
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                contact:
+                  type: object
+                  properties:
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                      format: email
+                description:
+                  type: string
+                image:
+                  type: string
+                destinations:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Destination'
+      responses:
+        '200':
+          description: Shop updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [Vendor Shops]
+      summary: Delete a shop
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Vendor Products
+  # ─────────────────────────────────────────────
+  /vendor/products:
+    post:
+      tags: [Vendor Products]
+      summary: Create a product
+      security:
+        - VendorAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, shop, stock, price, description, image, details, variant]
+              properties:
+                name:
+                  type: string
+                shop:
+                  type: string
+                stock:
+                  $ref: '#/components/schemas/Stock'
+                price:
+                  $ref: '#/components/schemas/Price'
+                description:
+                  type: string
+                image:
+                  type: string
+                details:
+                  type: object
+                variant:
+                  type: string
+                  enum: [marijuana, edible, accessory]
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [Vendor Products]
+      summary: List vendor products
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: variant
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+
+  /vendor/products/{id}:
+    get:
+      tags: [Vendor Products]
+      summary: Get a product by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Product'
+    put:
+      tags: [Vendor Products]
+      summary: Update a product
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                image:
+                  type: string
+                stock:
+                  $ref: '#/components/schemas/Stock'
+                price:
+                  $ref: '#/components/schemas/Price'
+                metadata:
+                  type: object
+      responses:
+        '200':
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [Vendor Products]
+      summary: Delete a product
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Vendor Orders
+  # ─────────────────────────────────────────────
+  /vendor/orders:
+    get:
+      tags: [Vendor Orders]
+      summary: List vendor orders
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: shop
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  count:
+                    type: integer
+
+  /vendor/orders/{id}:
+    get:
+      tags: [Vendor Orders]
+      summary: Get an order by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Order retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Order'
+
+  /vendor/orders/{id}/status:
+    put:
+      tags: [Vendor Orders]
+      summary: Update order status
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [delivering, completed, cancelled]
+      responses:
+        '200':
+          description: Order status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /vendor/orders/{id}/item-status:
+    put:
+      tags: [Vendor Orders]
+      summary: Update order item status
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemId, status]
+              properties:
+                itemId:
+                  type: string
+                status:
+                  type: string
+                  enum: [delivering, completed, cancelled]
+      responses:
+        '200':
+          description: Order item status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Vendor Reviews
+  # ─────────────────────────────────────────────
+  /vendor/reviews:
+    get:
+      tags: [Vendor Reviews]
+      summary: List product reviews
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: product
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  count:
+                    type: integer
+
+  /vendor/reviews/{id}:
+    get:
+      tags: [Vendor Reviews]
+      summary: Get a review by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Review'
+
+  /vendor/reviews/{id}/visibility:
+    put:
+      tags: [Vendor Reviews]
+      summary: Toggle review visibility
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review visibility toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Vendor Shop Reviews
+  # ─────────────────────────────────────────────
+  /vendor/shop-reviews:
+    get:
+      tags: [Vendor Shop Reviews]
+      summary: List shop reviews
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Shop reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShopReview'
+                  count:
+                    type: integer
+
+  /vendor/shop-reviews/{id}:
+    get:
+      tags: [Vendor Shop Reviews]
+      summary: Get a shop review by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShopReview'
+
+  /vendor/shop-reviews/{id}/visibility:
+    put:
+      tags: [Vendor Shop Reviews]
+      summary: Toggle shop review visibility
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review visibility toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Vendor Customers
+  # ─────────────────────────────────────────────
+  /vendor/customers:
+    get:
+      tags: [Vendor Customers]
+      summary: List customers
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+      responses:
+        '200':
+          description: Customers retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  count:
+                    type: integer
+
+  # ─────────────────────────────────────────────
+  # Vendor Promotions
+  # ─────────────────────────────────────────────
+  /vendor/promotions:
+    post:
+      tags: [Vendor Promotions]
+      summary: Create a promotion
+      security:
+        - VendorAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [variant, item, rank, startDate, duration, price, method, sender, recipient, transactionID]
+              properties:
+                variant:
+                  type: string
+                  enum: [shop, product]
+                item:
+                  type: string
+                rank:
+                  type: integer
+                startDate:
+                  type: string
+                  format: date-time
+                duration:
+                  $ref: '#/components/schemas/Duration'
+                price:
+                  $ref: '#/components/schemas/Price'
+                method:
+                  type: string
+                sender:
+                  $ref: '#/components/schemas/PaymentParty'
+                recipient:
+                  $ref: '#/components/schemas/PaymentParty'
+                transactionID:
+                  type: string
+      responses:
+        '201':
+          description: Promotion created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [Vendor Promotions]
+      summary: List vendor promotions
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: variant
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Promotions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Promotion'
+                  count:
+                    type: integer
+
+  /vendor/promotions/{id}:
+    get:
+      tags: [Vendor Promotions]
+      summary: Get a promotion by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Promotion retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Promotion'
+
+  # ─────────────────────────────────────────────
+  # Vendor Payments
+  # ─────────────────────────────────────────────
+  /vendor/payments:
+    get:
+      tags: [Vendor Payments]
+      summary: List vendor payments
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: purpose
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payments retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  count:
+                    type: integer
+
+  /vendor/payments/{id}:
+    get:
+      tags: [Vendor Payments]
+      summary: Get a payment by ID
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Payment'
+
+  # ─────────────────────────────────────────────
+  # Vendor Shop Visits
+  # ─────────────────────────────────────────────
+  /vendor/shop-visits:
+    get:
+      tags: [Vendor Shop Visits]
+      summary: List shop visits
+      security:
+        - VendorAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: shop
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shop visits retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShopVisit'
+                  count:
+                    type: integer
+
+  # ─────────────────────────────────────────────
+  # Vendor Dashboard
+  # ─────────────────────────────────────────────
+  /vendor/dashboard:
+    get:
+      tags: [Vendor Dashboard]
+      summary: Get vendor dashboard overview
+      security:
+        - VendorAuth: []
+      responses:
+        '200':
+          description: Dashboard data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      shops:
+                        type: integer
+                      products:
+                        type: integer
+                      orders:
+                        type: integer
+                      reviews:
+                        type: integer
+                      shopVisits:
+                        type: integer
+                      revenue:
+                        type: number
+
+  /vendor/dashboard/analytics:
+    get:
+      tags: [Vendor Dashboard]
+      summary: Get vendor dashboard analytics
+      security:
+        - VendorAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Analytics data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      ordersByDate:
+                        type: array
+                        items:
+                          type: object
+                      topProducts:
+                        type: array
+                        items:
+                          type: object
+                      visitsByDate:
+                        type: array
+                        items:
+                          type: object
+
+  # ─────────────────────────────────────────────
+  # Admin Auth
+  # ─────────────────────────────────────────────
+  /admin/auth/register:
+    post:
+      tags: [Admin Auth]
+      summary: Register an admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password, phone, firstName, lastName, pin, email]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+                phone:
+                  type: string
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                pin:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                role:
+                  type: string
+                  enum: [admin, super-admin]
+      responses:
+        '201':
+          description: Admin registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/login:
+    post:
+      tags: [Admin Auth]
+      summary: Login an admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usernameOrEmailOrPhone, password]
+              properties:
+                usernameOrEmailOrPhone:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+
+  /admin/auth/otp/{token}/verify:
+    post:
+      tags: [Admin Auth]
+      summary: Verify admin OTP
+      parameters:
+        - $ref: '#/components/parameters/TokenParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [otp]
+              properties:
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: OTP verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Admin'
+                  token:
+                    type: string
+
+  /admin/auth/otp/resend:
+    post:
+      tags: [Admin Auth]
+      summary: Resend admin OTP
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [usernameOrEmailOrPhone]
+              properties:
+                usernameOrEmailOrPhone:
+                  type: string
+      responses:
+        '200':
+          description: OTP resent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/profile:
+    get:
+      tags: [Admin Auth]
+      summary: Get admin profile
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: Admin profile retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Admin'
+    put:
+      tags: [Admin Auth]
+      summary: Update admin profile
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                username:
+                  type: string
+                phone:
+                  type: string
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/profile/{token}:
+    put:
+      tags: [Admin Auth]
+      summary: Verify admin profile update with OTP
+      parameters:
+        - $ref: '#/components/parameters/TokenParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [otp]
+              properties:
+                otp:
+                  type: string
+      responses:
+        '200':
+          description: Profile verified
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/passwords/change:
+    put:
+      tags: [Admin Auth]
+      summary: Change admin password
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPassword, password]
+              properties:
+                currentPassword:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/passwords/reset:
+    put:
+      tags: [Admin Auth]
+      summary: Reset admin password
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password]
+              properties:
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Password reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/pins/change:
+    put:
+      tags: [Admin Auth]
+      summary: Change admin pin
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [currentPin, pin]
+              properties:
+                currentPin:
+                  type: string
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Pin changed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/pins/reset:
+    put:
+      tags: [Admin Auth]
+      summary: Reset admin pin
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pin]
+              properties:
+                pin:
+                  type: string
+      responses:
+        '200':
+          description: Pin reset
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/logout:
+    post:
+      tags: [Admin Auth]
+      summary: Logout admin current session
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/auth/logoutAll:
+    post:
+      tags: [Admin Auth]
+      summary: Logout admin all sessions
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: All sessions logged out
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Users
+  # ─────────────────────────────────────────────
+  /admin/users:
+    get:
+      tags: [Admin Users]
+      summary: List users
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Users retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+                  count:
+                    type: integer
+
+  /admin/users/{id}:
+    get:
+      tags: [Admin Users]
+      summary: Get a user by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: User retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/User'
+
+  /admin/users/{id}/status:
+    put:
+      tags: [Admin Users]
+      summary: Update user status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [active, suspended, frozen, deleted]
+      responses:
+        '200':
+          description: User status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/users/{id}/permissions:
+    put:
+      tags: [Admin Users]
+      summary: Update user permissions
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [permissions]
+              properties:
+                permissions:
+                  type: object
+                  description: "Nested object: {entity: {action: boolean}}"
+                  additionalProperties:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+      responses:
+        '200':
+          description: Permissions updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Shops
+  # ─────────────────────────────────────────────
+  /admin/shops:
+    get:
+      tags: [Admin Shops]
+      summary: List shops
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Shops retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Shop'
+                  count:
+                    type: integer
+
+  /admin/shops/{id}:
+    get:
+      tags: [Admin Shops]
+      summary: Get a shop by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Shop'
+
+  /admin/shops/{id}/approve:
+    put:
+      tags: [Admin Shops]
+      summary: Approve a shop
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/shops/{id}/suspend:
+    put:
+      tags: [Admin Shops]
+      summary: Suspend a shop
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop suspended
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/shops/{id}/feature:
+    put:
+      tags: [Admin Shops]
+      summary: Feature a shop
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [value, startDate, endDate]
+              properties:
+                value:
+                  type: boolean
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Shop featured status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/shops/{id}/status:
+    put:
+      tags: [Admin Shops]
+      summary: Update shop status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+      responses:
+        '200':
+          description: Shop status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Products
+  # ─────────────────────────────────────────────
+  /admin/products:
+    get:
+      tags: [Admin Products]
+      summary: List products
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: variant
+          in: query
+          schema:
+            type: string
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: owner
+          in: query
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Products retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+                  count:
+                    type: integer
+
+  /admin/products/{id}:
+    get:
+      tags: [Admin Products]
+      summary: Get a product by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Product'
+
+  /admin/products/{id}/approve:
+    put:
+      tags: [Admin Products]
+      summary: Approve a product
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Product approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/products/{id}/feature:
+    put:
+      tags: [Admin Products]
+      summary: Feature a product
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, startDate, endDate]
+              properties:
+                status:
+                  type: boolean
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+      responses:
+        '200':
+          description: Product featured status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/products/{id}/sale:
+    put:
+      tags: [Admin Products]
+      summary: Set product sale
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status, startDate, endDate, price]
+              properties:
+                status:
+                  type: boolean
+                startDate:
+                  type: string
+                  format: date-time
+                endDate:
+                  type: string
+                  format: date-time
+                price:
+                  $ref: '#/components/schemas/Price'
+      responses:
+        '200':
+          description: Product sale updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/products/{id}/status:
+    put:
+      tags: [Admin Products]
+      summary: Update product status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [active, deleted, pending]
+      responses:
+        '200':
+          description: Product status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Orders
+  # ─────────────────────────────────────────────
+  /admin/orders:
+    get:
+      tags: [Admin Orders]
+      summary: List orders
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: user
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+                  count:
+                    type: integer
+
+  /admin/orders/{id}:
+    get:
+      tags: [Admin Orders]
+      summary: Get an order by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Order retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Order'
+
+  /admin/orders/{id}/status:
+    put:
+      tags: [Admin Orders]
+      summary: Update order status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [pending, delivering, completed, cancelled]
+      responses:
+        '200':
+          description: Order status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Reviews
+  # ─────────────────────────────────────────────
+  /admin/reviews:
+    get:
+      tags: [Admin Reviews]
+      summary: List reviews
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: product
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  count:
+                    type: integer
+
+  /admin/reviews/{id}:
+    get:
+      tags: [Admin Reviews]
+      summary: Get a review by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Review'
+    delete:
+      tags: [Admin Reviews]
+      summary: Delete a review
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/reviews/{id}/visibility:
+    put:
+      tags: [Admin Reviews]
+      summary: Toggle review visibility
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review visibility toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Shop Reviews
+  # ─────────────────────────────────────────────
+  /admin/shop-reviews:
+    get:
+      tags: [Admin Shop Reviews]
+      summary: List shop reviews
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: shop
+          in: query
+          schema:
+            type: string
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Shop reviews retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShopReview'
+                  count:
+                    type: integer
+
+  /admin/shop-reviews/{id}:
+    get:
+      tags: [Admin Shop Reviews]
+      summary: Get a shop review by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/ShopReview'
+    delete:
+      tags: [Admin Shop Reviews]
+      summary: Delete a shop review
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/shop-reviews/{id}/visibility:
+    put:
+      tags: [Admin Shop Reviews]
+      summary: Toggle shop review visibility
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Shop review visibility toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Testimonials
+  # ─────────────────────────────────────────────
+  /admin/testimonials:
+    get:
+      tags: [Admin Testimonials]
+      summary: List testimonials
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Testimonials retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Testimonial'
+                  count:
+                    type: integer
+
+  /admin/testimonials/{id}:
+    get:
+      tags: [Admin Testimonials]
+      summary: Get a testimonial by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Testimonial retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Testimonial'
+    delete:
+      tags: [Admin Testimonials]
+      summary: Delete a testimonial
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Testimonial deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  /admin/testimonials/{id}/visibility:
+    put:
+      tags: [Admin Testimonials]
+      summary: Toggle testimonial visibility
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Testimonial visibility toggled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin FAQs
+  # ─────────────────────────────────────────────
+  /admin/faqs:
+    post:
+      tags: [Admin FAQs]
+      summary: Create a FAQ
+      security:
+        - AdminAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [question, answer]
+              properties:
+                question:
+                  type: string
+                answer:
+                  type: string
+                category:
+                  type: string
+                visible:
+                  type: boolean
+                order:
+                  type: integer
+      responses:
+        '201':
+          description: FAQ created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    get:
+      tags: [Admin FAQs]
+      summary: List FAQs
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: visible
+          in: query
+          schema:
+            type: boolean
+        - name: category
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: FAQs retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FAQ'
+                  count:
+                    type: integer
+
+  /admin/faqs/{id}:
+    get:
+      tags: [Admin FAQs]
+      summary: Get a FAQ by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: FAQ retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/FAQ'
+    put:
+      tags: [Admin FAQs]
+      summary: Update a FAQ
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                answer:
+                  type: string
+                category:
+                  type: string
+                visible:
+                  type: boolean
+                order:
+                  type: integer
+      responses:
+        '200':
+          description: FAQ updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [Admin FAQs]
+      summary: Delete a FAQ
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: FAQ deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Messages
+  # ─────────────────────────────────────────────
+  /admin/messages:
+    get:
+      tags: [Admin Messages]
+      summary: List messages
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: user
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Messages retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Message'
+                  count:
+                    type: integer
+
+  /admin/messages/{id}:
+    get:
+      tags: [Admin Messages]
+      summary: Get a message by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Message retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Message'
+
+  /admin/messages/{id}/reply:
+    put:
+      tags: [Admin Messages]
+      summary: Reply to a message
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [text]
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: Reply sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Admins (super-admin only)
+  # ─────────────────────────────────────────────
+  /admin/admins:
+    get:
+      tags: [Admin Admins]
+      summary: List admins (super-admin only)
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: role
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Admins retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Admin'
+                  count:
+                    type: integer
+
+  /admin/admins/{id}:
+    get:
+      tags: [Admin Admins]
+      summary: Get an admin by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Admin retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Admin'
+    put:
+      tags: [Admin Admins]
+      summary: Update an admin
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, super-admin]
+                permissions:
+                  type: object
+                  additionalProperties:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+      responses:
+        '200':
+          description: Admin updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+    delete:
+      tags: [Admin Admins]
+      summary: Delete an admin
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Admin deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Payments
+  # ─────────────────────────────────────────────
+  /admin/payments:
+    get:
+      tags: [Admin Payments]
+      summary: List payments
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: method
+          in: query
+          schema:
+            type: string
+        - name: user
+          in: query
+          schema:
+            type: string
+        - name: purpose
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payments retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  count:
+                    type: integer
+
+  /admin/payments/{id}:
+    get:
+      tags: [Admin Payments]
+      summary: Get a payment by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Payment'
+
+  /admin/payments/{id}/status:
+    put:
+      tags: [Admin Payments]
+      summary: Update payment status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [pending, failed, success]
+      responses:
+        '200':
+          description: Payment status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Promotions
+  # ─────────────────────────────────────────────
+  /admin/promotions:
+    get:
+      tags: [Admin Promotions]
+      summary: List promotions
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/PageParam'
+        - $ref: '#/components/parameters/SizeParam'
+        - name: status
+          in: query
+          schema:
+            type: string
+        - name: variant
+          in: query
+          schema:
+            type: string
+        - name: user
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Promotions retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Promotion'
+                  count:
+                    type: integer
+
+  /admin/promotions/{id}:
+    get:
+      tags: [Admin Promotions]
+      summary: Get a promotion by ID
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Promotion retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Promotion'
+
+  /admin/promotions/{id}/status:
+    put:
+      tags: [Admin Promotions]
+      summary: Update promotion status
+      security:
+        - AdminAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [pending, active, expired]
+      responses:
+        '200':
+          description: Promotion status updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+
+  # ─────────────────────────────────────────────
+  # Admin Dashboard
+  # ─────────────────────────────────────────────
+  /admin/dashboard:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get dashboard overview
+      security:
+        - AdminAuth: []
+      responses:
+        '200':
+          description: Dashboard data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      users:
+                        type: integer
+                      shops:
+                        type: integer
+                      products:
+                        type: integer
+                      orders:
+                        type: integer
+                      payments:
+                        type: integer
+                      reviews:
+                        type: integer
+                      messages:
+                        type: integer
+                      revenue:
+                        type: number
+
+  /admin/dashboard/analytics:
+    get:
+      tags: [Admin Dashboard]
+      summary: Get dashboard analytics
+      security:
+        - AdminAuth: []
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: Analytics data retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      ordersByDate:
+                        type: array
+                        items:
+                          type: object
+                      topProducts:
+                        type: array
+                        items:
+                          type: object
+                      topShops:
+                        type: array
+                        items:
+                          type: object
+                      newUsersByDate:
+                        type: array
+                        items:
+                          type: object

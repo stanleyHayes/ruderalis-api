@@ -53,7 +53,7 @@ exports.getTestimonials = async (req, res) => {
             .populate({path: 'user', select: 'fullName'})
             .populate({path: 'product', select: 'name'});
 
-        const totalTestimonials = await Testimonial.find(match).countDocuments();
+        const totalTestimonials = await Testimonial.countDocuments(match);
         res.status(200).json({
             message: 'Testimonials retrieved successfully',
             data: testimonials,
@@ -119,10 +119,10 @@ exports.deleteTestimonial = async (req, res) => {
         if (req.user.role === 'user' || req.user.role === 'vendor') {
             if (req.user._id !== testimonial.user._id)
                 return res.status(403).json({message: "You don't have enough permissions to perform this operation"});
-            await testimonial.remove();
+            await testimonial.deleteOne();
             return res.status(200).json({message: 'Testimonial removed successfully', data: testimonial});
         }
-        await testimonial.remove();
+        await testimonial.deleteOne();
         return res.status(200).json({message: 'Testimonial removed successfully', data: testimonial});
     } catch (e) {
         res.status(500).json({message: e.message});

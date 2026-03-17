@@ -1,0 +1,4889 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Ruderalis API",
+		"description": "Medical marijuana ecommerce backend API collection for the Ruderalis platform.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "userToken",
+			"value": "",
+			"type": "string",
+			"description": "Set after user login"
+		},
+		{
+			"key": "adminToken",
+			"value": "",
+			"type": "string",
+			"description": "Set after admin login"
+		},
+		{
+			"key": "vendorToken",
+			"value": "",
+			"type": "string",
+			"description": "Set after vendor login (register with role:vendor via /user/auth)"
+		}
+	],
+	"item": [
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Auth",
+					"description": "User authentication endpoints including registration, login, OTP verification, profile management, password and pin management, and session control.",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"username\": \"johndoe\",\n\t\"password\": \"Test@1234\",\n\t\"phone\": \"+233541234567\",\n\t\"firstName\": \"John\",\n\t\"lastName\": \"Doe\",\n\t\"pin\": \"1234\",\n\t\"email\": \"john@example.com\",\n\t\"role\": \"user\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/register",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "register"]
+								}
+							}
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"usernameOrEmailOrPhone\": \"johndoe\",\n\t\"password\": \"Test@1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Verify OTP",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"otp\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/otp/:token/verify",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "otp", ":token", "verify"],
+									"variable": [
+										{
+											"key": "token",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Resend OTP",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"usernameOrEmailOrPhone\": \"johndoe\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/otp/resend",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "otp", "resend"]
+								}
+							}
+						},
+						{
+							"name": "Get Profile",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile"]
+								}
+							}
+						},
+						{
+							"name": "Update Profile",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"firstName\": \"John\",\n\t\"lastName\": \"Smith\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile"]
+								}
+							}
+						},
+						{
+							"name": "Verify Profile Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"otp\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile/:token",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile", ":token"],
+									"variable": [
+										{
+											"key": "token",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Profile",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"pin\": \"1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile"]
+								}
+							}
+						},
+						{
+							"name": "Freeze Profile",
+							"request": {
+								"method": "DELETE",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"pin\": \"1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile/freeze",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile", "freeze"]
+								}
+							}
+						},
+						{
+							"name": "Activate Profile",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"pin\": \"1234\",\n\t\"email\": \"john@example.com\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/profile/activate",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "profile", "activate"]
+								}
+							}
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"currentPassword\": \"Test@1234\",\n\t\"password\": \"Test@5678\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/passwords/change",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "passwords", "change"]
+								}
+							}
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"password\": \"Test@1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/passwords/reset?token=xxx",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "passwords", "reset"],
+									"query": [
+										{
+											"key": "token",
+											"value": "xxx"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Change Pin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"currentPin\": \"1234\",\n\t\"pin\": \"5678\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/pins/change",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "pins", "change"]
+								}
+							}
+						},
+						{
+							"name": "Reset Pin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"pin\": \"1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/pins/reset?token=xxx",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "pins", "reset"],
+									"query": [
+										{
+											"key": "token",
+											"value": "xxx"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/logout",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "logout"]
+								}
+							}
+						},
+						{
+							"name": "Logout All",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/auth/logoutAll",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "auth", "logoutAll"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"description": "User product management endpoints for creating, reading, updating, and deleting products.",
+					"item": [
+						{
+							"name": "Create Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"OG Kush\",\n\t\"shop\": \"shopId\",\n\t\"stock\": {\n\t\t\"available\": true,\n\t\t\"quantity\": 100\n\t},\n\t\"price\": {\n\t\t\"amount\": 50,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"description\": \"Premium medical marijuana strain\",\n\t\"image\": \"https://example.com/image.jpg\",\n\t\"details\": {\n\t\t\"thc\": \"25%\",\n\t\t\"cbd\": \"1%\"\n\t},\n\t\"variant\": \"marijuana\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "products"]
+								}
+							}
+						},
+						{
+							"name": "Get All Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/products?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "products"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"OG Kush Premium\",\n\t\"price\": {\n\t\t\"amount\": 60,\n\t\t\"currency\": \"GHS\"\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shops",
+					"description": "User shop management endpoints for creating, reading, updating, and deleting shops.",
+					"item": [
+						{
+							"name": "Create Shop",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Green Leaf Dispensary\",\n\t\"contact\": {\n\t\t\"phone\": \"+233541234567\",\n\t\t\"email\": \"shop@example.com\"\n\t},\n\t\"description\": \"Premium medical marijuana dispensary\",\n\t\"image\": \"https://example.com/shop.jpg\",\n\t\"destinations\": [\n\t\t{\n\t\t\t\"name\": \"Accra\",\n\t\t\t\"price\": {\n\t\t\t\t\"amount\": 10,\n\t\t\t\t\"currency\": \"GHS\"\n\t\t\t}\n\t\t}\n\t]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shops",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shops"]
+								}
+							}
+						},
+						{
+							"name": "Get All Shops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shops?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shops"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Shop",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Green Leaf Premium\",\n\t\"description\": \"Updated description\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Shop",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"description": "User product review endpoints for creating, reading, updating, and deleting reviews.",
+					"item": [
+						{
+							"name": "Create Review",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"product\": \"productId\",\n\t\"text\": \"Great product!\",\n\t\"rating\": 5\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/reviews",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "reviews"]
+								}
+							}
+						},
+						{
+							"name": "Get All Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/reviews?page=1&size=20&product=productId",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "product",
+											"value": "productId"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Review by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Review",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\": \"Updated review\",\n\t\"rating\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Review",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shop Reviews",
+					"description": "User shop review endpoints for creating, reading, updating, and deleting shop reviews.",
+					"item": [
+						{
+							"name": "Create Shop Review",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"shop\": \"shopId\",\n\t\"text\": \"Great shop!\",\n\t\"rating\": 5\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-reviews",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-reviews"]
+								}
+							}
+						},
+						{
+							"name": "Get All Shop Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-reviews?page=1&size=20&shop=shopId",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "shop",
+											"value": "shopId"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop Review by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Shop Review",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\": \"Updated\",\n\t\"rating\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Shop Review",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Orders",
+					"description": "User order management endpoints for creating, reading, updating, and cancelling orders.",
+					"item": [
+						{
+							"name": "Create Order",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"items\": [\n\t\t{\n\t\t\t\"product\": \"productId\",\n\t\t\t\"quantity\": 2\n\t\t}\n\t],\n\t\"price\": {\n\t\t\"amount\": 100,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"destination\": \"Accra, Ghana\",\n\t\"shop\": \"shopId\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/orders",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "orders"]
+								}
+							}
+						},
+						{
+							"name": "Get All Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/orders?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "orders"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Order by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/orders/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "orders", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Order",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"destination\": \"Kumasi, Ghana\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/orders/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "orders", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Cancel Order",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/orders/:id/cancel",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "orders", ":id", "cancel"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Payments",
+					"description": "User payment endpoints for creating and viewing payments.",
+					"item": [
+						{
+							"name": "Create Payment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"price\": {\n\t\t\"amount\": 50,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"method\": \"mobile money\",\n\t\"sender\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0541234567\"\n\t},\n\t\"recipient\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0551234567\"\n\t},\n\t\"transactionID\": \"TXN123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/payments",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "payments"]
+								}
+							}
+						},
+						{
+							"name": "Get All Payments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/payments?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "payments"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Payment by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/payments/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "payments", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Promotions",
+					"description": "User promotion endpoints for creating and viewing promotions.",
+					"item": [
+						{
+							"name": "Create Promotion",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"variant\": \"product\",\n\t\"item\": \"productId\",\n\t\"rank\": 5,\n\t\"startDate\": \"2026-03-15\",\n\t\"duration\": {\n\t\t\"amount\": 30,\n\t\t\"unit\": \"day\"\n\t},\n\t\"price\": {\n\t\t\"amount\": 100,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"method\": \"mobile money\",\n\t\"sender\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0541234567\"\n\t},\n\t\"recipient\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0551234567\"\n\t},\n\t\"transactionID\": \"TXN789\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/promotions",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "promotions"]
+								}
+							}
+						},
+						{
+							"name": "Get All Promotions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/promotions?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "promotions"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Promotion by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/promotions/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "promotions", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Testimonials",
+					"description": "User testimonial endpoints for creating, reading, updating, and deleting testimonials.",
+					"item": [
+						{
+							"name": "Create Testimonial",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\": \"Amazing platform!\",\n\t\"rating\": 5\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/testimonials",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "testimonials"]
+								}
+							}
+						},
+						{
+							"name": "Get All Testimonials",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/testimonials?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "testimonials"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Testimonial by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/testimonials/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "testimonials", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Testimonial",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\": \"Updated testimonial\",\n\t\"rating\": 4\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/testimonials/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "testimonials", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Testimonial",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/testimonials/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "testimonials", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "FAQs",
+					"description": "Public FAQ endpoints. No authentication required.",
+					"item": [
+						{
+							"name": "Get All FAQs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/faqs?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "faqs"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get FAQ by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/user/faqs/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "faqs", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Messages",
+					"description": "User message endpoints for sending and viewing messages.",
+					"item": [
+						{
+							"name": "Create Message",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"subject\": \"Help with order\",\n\t\"text\": \"I need help with my recent order\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/messages",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "messages"]
+								}
+							}
+						},
+						{
+							"name": "Get All Messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/messages?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "messages"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Message by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/messages/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "messages", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Customers",
+					"description": "User customer listing endpoints.",
+					"item": [
+						{
+							"name": "Get All Customers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/customers?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "customers"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shop Visits",
+					"description": "User shop visit tracking endpoints.",
+					"item": [
+						{
+							"name": "Create Shop Visit",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"shop\": \"shopId\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-visits",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-visits"]
+								}
+							}
+						},
+						{
+							"name": "Get All Shop Visits",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{userToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/user/shop-visits?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["user", "shop-visits"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "Auth",
+					"description": "Admin authentication endpoints including registration, login, OTP verification, profile management, password and pin management, and session control.",
+					"item": [
+						{
+							"name": "Register",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"username\": \"admin1\",\n\t\"password\": \"Admin@1234\",\n\t\"phone\": \"+233541234568\",\n\t\"firstName\": \"Admin\",\n\t\"lastName\": \"User\",\n\t\"pin\": \"1234\",\n\t\"email\": \"admin@example.com\",\n\t\"role\": \"super-admin\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/register",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "register"]
+								}
+							}
+						},
+						{
+							"name": "Login",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"usernameOrEmailOrPhone\": \"admin1\",\n\t\"password\": \"Admin@1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/login",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "login"]
+								}
+							}
+						},
+						{
+							"name": "Verify OTP",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"otp\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/otp/:token/verify",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "otp", ":token", "verify"],
+									"variable": [
+										{
+											"key": "token",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Resend OTP",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"usernameOrEmailOrPhone\": \"admin1\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/otp/resend",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "otp", "resend"]
+								}
+							}
+						},
+						{
+							"name": "Get Profile",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/profile",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "profile"]
+								}
+							}
+						},
+						{
+							"name": "Update Profile",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"firstName\": \"Super\",\n\t\"lastName\": \"Admin\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/profile",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "profile"]
+								}
+							}
+						},
+						{
+							"name": "Verify Profile Update",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"otp\": \"123456\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/profile/:token",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "profile", ":token"],
+									"variable": [
+										{
+											"key": "token",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Change Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"currentPassword\": \"Admin@1234\",\n\t\"password\": \"Admin@5678\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/passwords/change",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "passwords", "change"]
+								}
+							}
+						},
+						{
+							"name": "Reset Password",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"password\": \"Admin@1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/passwords/reset?token=xxx",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "passwords", "reset"],
+									"query": [
+										{
+											"key": "token",
+											"value": "xxx"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Change Pin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"currentPin\": \"1234\",\n\t\"pin\": \"5678\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/pins/change",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "pins", "change"]
+								}
+							}
+						},
+						{
+							"name": "Reset Pin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"pin\": \"1234\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/pins/reset?token=xxx",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "pins", "reset"],
+									"query": [
+										{
+											"key": "token",
+											"value": "xxx"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Logout",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/logout",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "logout"]
+								}
+							}
+						},
+						{
+							"name": "Logout All",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/auth/logoutAll",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "auth", "logoutAll"]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Users",
+					"description": "Admin user management endpoints for viewing and managing user accounts, statuses, and permissions.",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users?page=1&size=20&status=active&role=vendor",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "users"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "active"
+										},
+										{
+											"key": "role",
+											"value": "vendor"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get User by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "users", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update User Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"suspended\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "users", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update User Permissions",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"permissions\": {\n\t\t\"product\": {\n\t\t\t\"create\": true,\n\t\t\t\"read\": true\n\t\t},\n\t\t\"shop\": {\n\t\t\t\"create\": true\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/users/:id/permissions",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "users", ":id", "permissions"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shops",
+					"description": "Admin shop management endpoints for viewing, approving, suspending, featuring, and managing shop statuses.",
+					"item": [
+						{
+							"name": "Get All Shops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Approve Shop",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops/:id/approve",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops", ":id", "approve"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Suspend Shop",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops/:id/suspend",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops", ":id", "suspend"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Feature Shop",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"value\": true,\n\t\"startDate\": \"2026-03-15\",\n\t\"endDate\": \"2026-04-15\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops/:id/feature",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops", ":id", "feature"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Shop Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"active\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shops/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shops", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"description": "Admin product management endpoints for viewing, approving, featuring, managing sales, and updating product statuses.",
+					"item": [
+						{
+							"name": "Get All Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Product by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Approve Product",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products/:id/approve",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products", ":id", "approve"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Feature Product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": true,\n\t\"startDate\": \"2026-03-15\",\n\t\"endDate\": \"2026-04-15\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products/:id/feature",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products", ":id", "feature"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Set Product Sale",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": true,\n\t\"startDate\": \"2026-03-15\",\n\t\"endDate\": \"2026-04-15\",\n\t\"price\": {\n\t\t\"amount\": 40,\n\t\t\"currency\": \"GHS\"\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products/:id/sale",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products", ":id", "sale"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Product Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"active\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/products/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "products", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Orders",
+					"description": "Admin order management endpoints for viewing orders and updating order statuses.",
+					"item": [
+						{
+							"name": "Get All Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/orders?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "orders"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Order by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/orders/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "orders", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Order Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"delivering\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/orders/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "orders", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"description": "Admin review management endpoints for viewing, toggling visibility, and deleting product reviews.",
+					"item": [
+						{
+							"name": "Get All Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/reviews?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Review by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Toggle Review Visibility",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/reviews/:id/visibility",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "reviews", ":id", "visibility"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Review",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shop Reviews",
+					"description": "Admin shop review management endpoints for viewing, toggling visibility, and deleting shop reviews.",
+					"item": [
+						{
+							"name": "Get All Shop Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shop-reviews?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shop-reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop Review by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Toggle Shop Review Visibility",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shop-reviews/:id/visibility",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shop-reviews", ":id", "visibility"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Shop Review",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Testimonials",
+					"description": "Admin testimonial management endpoints for viewing, toggling visibility, and deleting testimonials.",
+					"item": [
+						{
+							"name": "Get All Testimonials",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/testimonials?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "testimonials"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Testimonial by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/testimonials/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "testimonials", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Toggle Testimonial Visibility",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/testimonials/:id/visibility",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "testimonials", ":id", "visibility"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Testimonial",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/testimonials/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "testimonials", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "FAQs",
+					"description": "Admin FAQ management endpoints for creating, reading, updating, and deleting FAQs.",
+					"item": [
+						{
+							"name": "Create FAQ",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"question\": \"What is Ruderalis?\",\n\t\"answer\": \"Ruderalis is a medical marijuana ecommerce platform\",\n\t\"category\": \"General\",\n\t\"visible\": true,\n\t\"order\": 1\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/faqs",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "faqs"]
+								}
+							}
+						},
+						{
+							"name": "Get All FAQs",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/faqs?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "faqs"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get FAQ by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/faqs/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "faqs", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update FAQ",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"answer\": \"Updated answer\",\n\t\"visible\": true\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/faqs/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "faqs", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete FAQ",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/faqs/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "faqs", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Messages",
+					"description": "Admin message management endpoints for viewing messages and sending replies.",
+					"item": [
+						{
+							"name": "Get All Messages",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/messages?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "messages"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Message by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/messages/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "messages", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Reply to Message",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"text\": \"Thank you for reaching out. We will look into this.\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/messages/:id/reply",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "messages", ":id", "reply"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Admins",
+					"description": "Super-admin only endpoints for managing admin accounts.",
+					"item": [
+						{
+							"name": "Get All Admins",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/admins?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "admins"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Admin by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/admins/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "admins", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Admin",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"active\",\n\t\"role\": \"admin\",\n\t\"permissions\": {\n\t\t\"users\": {\n\t\t\t\"read\": true\n\t\t}\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/admins/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "admins", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Admin",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/admins/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "admins", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Payments",
+					"description": "Admin payment management endpoints for viewing payments and updating payment statuses.",
+					"item": [
+						{
+							"name": "Get All Payments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/payments?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "payments"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Payment by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/payments/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "payments", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Payment Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"success\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/payments/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "payments", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Promotions",
+					"description": "Admin promotion management endpoints for viewing promotions and updating promotion statuses.",
+					"item": [
+						{
+							"name": "Get All Promotions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/promotions?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "promotions"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Promotion by ID",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/promotions/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "promotions", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Promotion Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"active\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/promotions/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "promotions", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Dashboard",
+					"description": "Admin dashboard endpoints for overview statistics and analytics.",
+					"item": [
+						{
+							"name": "Get Dashboard",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/dashboard",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "dashboard"]
+								}
+							}
+						},
+						{
+							"name": "Get Dashboard Analytics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{adminToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/admin/dashboard/analytics?startDate=2026-01-01&endDate=2026-03-15",
+									"host": ["{{baseUrl}}"],
+									"path": ["admin", "dashboard", "analytics"],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2026-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2026-03-15"
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "Vendor",
+			"description": "Vendor endpoints for managing shops, products, orders, reviews, customers, promotions, payments, shop visits, and dashboard analytics. Vendors register via /user/auth with role:vendor.",
+			"item": [
+				{
+					"name": "Shops",
+					"description": "Vendor shop management endpoints.",
+					"item": [
+						{
+							"name": "Create Shop",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Green Leaf Dispensary\",\n\t\"contact\": {\n\t\t\"phone\": \"+233541234567\",\n\t\t\"email\": \"shop@example.com\"\n\t},\n\t\"description\": \"Premium medical marijuana dispensary\",\n\t\"image\": \"https://example.com/shop.jpg\",\n\t\"destinations\": [\n\t\t{\n\t\t\t\"name\": \"Accra\",\n\t\t\t\"price\": {\n\t\t\t\t\"amount\": 10,\n\t\t\t\t\"currency\": \"GHS\"\n\t\t\t}\n\t\t}\n\t]\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shops",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shops"]
+								}
+							}
+						},
+						{
+							"name": "List Shops",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shops?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shops"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Shop",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"Green Leaf Premium\",\n\t\"description\": \"Updated description\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Shop",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shops/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shops", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Products",
+					"description": "Vendor product management endpoints.",
+					"item": [
+						{
+							"name": "Create Product",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"OG Kush\",\n\t\"shop\": \"shopId\",\n\t\"stock\": {\n\t\t\"available\": true,\n\t\t\"quantity\": 100\n\t},\n\t\"price\": {\n\t\t\"amount\": 50,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"description\": \"Premium medical marijuana strain\",\n\t\"image\": \"https://example.com/image.jpg\",\n\t\"details\": {\n\t\t\"thc\": \"25%\",\n\t\t\"cbd\": \"1%\"\n\t},\n\t\"variant\": \"marijuana\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/products",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "products"]
+								}
+							}
+						},
+						{
+							"name": "List Products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/products?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "products"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Product",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"OG Kush Premium\",\n\t\"price\": {\n\t\t\"amount\": 60,\n\t\t\"currency\": \"GHS\"\n\t}\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Delete Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/products/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "products", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Orders",
+					"description": "Vendor order management endpoints.",
+					"item": [
+						{
+							"name": "List Orders",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/orders?page=1&size=20&status=pending",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "orders"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										},
+										{
+											"key": "status",
+											"value": "pending"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Order",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/orders/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "orders", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Order Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"status\": \"delivering\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/orders/:id/status",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "orders", ":id", "status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Update Item Status",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"itemId\": \"itemId\",\n\t\"status\": \"delivering\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/orders/:id/item-status",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "orders", ":id", "item-status"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Reviews",
+					"description": "Vendor product review management endpoints.",
+					"item": [
+						{
+							"name": "List Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/reviews?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Review",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Toggle Review Visibility",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/reviews/:id/visibility",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "reviews", ":id", "visibility"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shop Reviews",
+					"description": "Vendor shop review management endpoints.",
+					"item": [
+						{
+							"name": "List Shop Reviews",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shop-reviews?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shop-reviews"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Shop Review",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shop-reviews/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shop-reviews", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Toggle Shop Review Visibility",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shop-reviews/:id/visibility",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shop-reviews", ":id", "visibility"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Customers",
+					"description": "Vendor customer management endpoints.",
+					"item": [
+						{
+							"name": "List Customers",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/customers?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "customers"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Promotions",
+					"description": "Vendor promotion management endpoints.",
+					"item": [
+						{
+							"name": "Create Promotion",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"variant\": \"product\",\n\t\"item\": \"productId\",\n\t\"rank\": 5,\n\t\"startDate\": \"2026-03-15\",\n\t\"duration\": {\n\t\t\"amount\": 30,\n\t\t\"unit\": \"day\"\n\t},\n\t\"price\": {\n\t\t\"amount\": 100,\n\t\t\"currency\": \"GHS\"\n\t},\n\t\"method\": \"mobile money\",\n\t\"sender\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0541234567\"\n\t},\n\t\"recipient\": {\n\t\t\"provider\": \"mtn\",\n\t\t\"number\": \"0551234567\"\n\t},\n\t\"transactionID\": \"TXN789\"\n}"
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/promotions",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "promotions"]
+								}
+							}
+						},
+						{
+							"name": "List Promotions",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/promotions?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "promotions"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Promotion",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/promotions/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "promotions", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Payments",
+					"description": "Vendor payment management endpoints.",
+					"item": [
+						{
+							"name": "List Payments",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/payments?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "payments"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						},
+						{
+							"name": "Get Payment",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/payments/:id",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "payments", ":id"],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Shop Visits",
+					"description": "Vendor shop visit tracking endpoints.",
+					"item": [
+						{
+							"name": "List Shop Visits",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/shop-visits?page=1&size=20",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "shop-visits"],
+									"query": [
+										{
+											"key": "page",
+											"value": "1"
+										},
+										{
+											"key": "size",
+											"value": "20"
+										}
+									]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Dashboard",
+					"description": "Vendor dashboard and analytics endpoints.",
+					"item": [
+						{
+							"name": "Get Dashboard",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/dashboard",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "dashboard"]
+								}
+							}
+						},
+						{
+							"name": "Get Analytics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{vendorToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"url": {
+									"raw": "{{baseUrl}}/vendor/dashboard/analytics?startDate=2026-01-01&endDate=2026-03-15",
+									"host": ["{{baseUrl}}"],
+									"path": ["vendor", "dashboard", "analytics"],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2026-01-01"
+										},
+										{
+											"key": "endDate",
+											"value": "2026-03-15"
+										}
+									]
+								}
+							}
+						}
+					]
+				}
+			]
+		}
+	]
+}

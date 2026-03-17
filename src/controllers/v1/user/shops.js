@@ -68,13 +68,19 @@ exports.getShops = async (req, res) => {
         if (req.query.status) {
             match['status'] = req.query.status;
         }
+        if (req.query.featured === 'true') {
+            match['featured.value'] = true;
+        }
+        if (req.query.search) {
+            match['name'] = {$regex: req.query.search, $options: 'i'};
+        }
         const shops = await Shop.find(match).skip(skip).limit(limit).sort({
             rank: -1,
             "rating.average": -1,
             createdAt: -1
         }).populate({path: 'reviews', populate: {path: 'user'}})
             .populate({path: 'owner', select: 'firstName lastName fullName image phone email'});
-        const totalShops =  await Shop.find(match).countDocuments();
+        const totalShops = await Shop.countDocuments(match);
         res.status(200).json({message: 'Shops Retrieved Successfully', data: shops, count: totalShops});
     } catch (e) {
         res.status(500).json({message: e.message});

@@ -28,25 +28,25 @@ const reviewSchema = new mongoose.Schema({
     useful: {
         type: [
             {
-                user: {type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true},
+                user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
                 response: {type: String, enum: ['yes', 'no'], required: true},
-                createdAt: {type: Date, default: Date.now()}
+                createdAt: {type: Date, default: Date.now}
             }
         ]
     },
     spam: {
         type: [
             {
-                user: {type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true},
-                createdAt: {type: Date, default: Date.now()}
+                user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+                createdAt: {type: Date, default: Date.now}
             }
         ]
     },
     inappropriate: {
         type: [
             {
-                user: {type: Schema.Types.ObjectId, ref: 'User', required: true, unique: true},
-                createdAt: {type: Date, default: Date.now()}
+                user: {type: Schema.Types.ObjectId, ref: 'User', required: true},
+                createdAt: {type: Date, default: Date.now}
             }
         ]
     }

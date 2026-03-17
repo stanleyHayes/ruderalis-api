@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
     name: {type: String, trim: true, required: true},
-    owner: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Vendor'},
+    owner: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User'},
     shop: {type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Shop'},
     status: {
         type: String,
@@ -101,9 +101,35 @@ const productSchema = new mongoose.Schema({
     },
     variant: {
         type: String,
-        enum: ['marijuana', 'edible', 'accessory'],
+        enum: ['marijuana', 'edible', 'accessory', 'flower', 'concentrate', 'topical', 'pre-roll', 'tincture', 'vape'],
         required: true
-    }
+    },
+    category: {
+        type: String,
+        trim: true
+    },
+    strain: {
+        type: String,
+        enum: ['sativa', 'indica', 'hybrid', 'cbd', ''],
+        default: ''
+    },
+    thc: {
+        type: Number,
+        default: 0
+    },
+    cbd: {
+        type: Number,
+        default: 0
+    },
+    weight: {
+        type: String,
+        trim: true
+    },
+    sku: {
+        type: String,
+        trim: true
+    },
+    tags: [{type: String, trim: true}]
 }, {
     timestamps: {createdAt: true, updatedAt: true},
     toJSON: {virtuals: true},
@@ -114,7 +140,7 @@ productSchema.virtual('reviews', {
     justOne: false,
     localField: '_id',
     foreignField: 'product',
-    ref: 'Product',
+    ref: 'Review',
 });
 
 
