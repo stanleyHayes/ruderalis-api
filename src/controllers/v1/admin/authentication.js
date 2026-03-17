@@ -67,31 +67,28 @@ exports.login = async (req, res) => {
             return res.status(401).json({ message: 'Auth Failed' });
         if (existingAdmin.status === 'pending')
             return res.status(400).json({ message: 'Please verify your account' });
-        const otp = otpGenerator.generate(parseInt(keys.otpLength), {
-            digits: true,
-            lowerCaseAlphabets: false,
-            specialChars: false,
-            upperCaseAlphabets: false
-        });
 
         const token = jwt.sign(
             { _id: existingAdmin._id.toString() },
             keys.jwtSecret,
-            { expiresIn: '1h' },
+            { expiresIn: '24h' },
             null
         );
-        existingAdmin.authInfo = {
-            otp,
-            expiryDate: moment().add(1, 'hours'),
-            token
-        }
+
+        existingAdmin.authInfo = {};
+        existingAdmin.devices = existingAdmin.devices.concat({
+            token,
+            ip: req.useragent?.ip,
+            browser: req.useragent?.browser,
+            source: req.useragent?.source,
+            os: req.useragent?.os,
+            isMobile: req.useragent?.isMobile,
+            isDesktop: req.useragent?.isDesktop,
+            platform: req.useragent?.platform
+        });
         await existingAdmin.save();
-        const message = `Your admin OTP is ${otp}. OTP expires in 1 hour.`;
-        const subject = `Ruderalis Admin OTP`;
-        //await sendEmail(existingAdmin.email, subject, message);
-        res.status(200).json({ message: 'Check your email to verify otp.', token });
+        res.status(200).json({ message: 'Login successful', data: existingAdmin, token });
     } catch (e) {
-        console.log(e.message)
         res.status(500).json({ message: e.message });
     }
 }

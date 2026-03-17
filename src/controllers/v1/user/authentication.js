@@ -71,32 +71,27 @@ exports.login = async (req, res) => {
             return res.status(401).json({message: 'Auth Failed'});
         if (existingUser.status === 'pending')
             return res.status(400).json({message: 'Please verify your account'});
-        const otp = otpGenerator.generate(parseInt(keys.otpLength), {
-            digits: true,
-            lowerCaseAlphabets: false,
-            specialChars: false,
-            upperCaseAlphabets: false
-        });
-
+        // Bypass OTP — issue auth token directly
         const token = jwt.sign(
             {_id: existingUser._id.toString()},
             keys.jwtSecret,
-            {expiresIn: '1h'},
+            {expiresIn: '24h'},
             null
         );
 
-        existingUser.authInfo = {
-            otp,
-            expiryDate: moment().add(1, 'hours'),
-            token
-        }
+        existingUser.authInfo = {};
+        existingUser.devices = existingUser.devices.concat({
+            token,
+            ip: req.useragent?.ip,
+            browser: req.useragent?.browser,
+            source: req.useragent?.source,
+            os: req.useragent?.os,
+            isMobile: req.useragent?.isMobile,
+            isDesktop: req.useragent?.isDesktop,
+            platform: req.useragent?.platform
+        });
         await existingUser.save();
-        const link = `https://localhost:3000/auth/otp/${token}/verify`;
-        const message = `Your OTP is ${otp}. OTP expires in 1 hour. Access the link through ${link}`;
-        // await sendSMS(existingUser.phone, message);
-        const subject = `Ruderalis OTP`;
-        //await sendEmail(existingUser.email, subject, message);
-        res.status(200).json({message: 'Check your email to verify otp.', token});
+        res.status(200).json({message: 'Login successful', data: existingUser, token});
     } catch (e) {
         res.status(500).json({message: e.message});
     }
